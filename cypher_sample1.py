@@ -41,7 +41,7 @@ result = transaction.run("""
     """)
 for record in result:
     write_output.write(record['mt'] + '\n')
-    print(record['mt'])
+    # print(record['mt'])
 
 write_output.write("\n")
 
@@ -51,15 +51,33 @@ write_output.write("\n")
 write_output.write("### Q3 ###\n")
 
 result = transaction.run("""
-    MATCH (u) -[r:RATED]-> (m:Movie) 
-    WHERE r.stars <= 3 
-    RETURN m.title as mt 
+    MATCH (a:Actor)-[:ACTS_IN]->(m:Movie)
+    WITH collect(a) as actors, m
+    RETURN m.title, length(actors)
+    ORDER BY length(actors) DESC;   
     """)
 for record in result:
-    write_output.write(record['mt'] + '\n')
-    print(record['mt'])
+    write_output.write(record['m.title'] + ', ' + str(record['length(actors)']) + '\n')
+    # print(record['m.title'] + ', ' + str(record['length(actors)']))
 
 write_output.write("\n")
+
+# 6.) List which genres have movies where Tom Hanks starred in.
+# OUTPUT: genre
+
+write_output.write("### Q6 ###\n")
+
+result = transaction.run("""
+    MATCH (a:Actor)-[:ACTS_IN]->(m:Movie)
+    WHERE a.name = "Tom Hanks"
+    RETURN DISTINCT m.genre
+    """)
+for record in result:
+    write_output.write(record['m.genre'] + '\n')
+    print(record['m.genre'])
+
+write_output.write("\n")
+
 
 transaction.close()
 write_output.close()
