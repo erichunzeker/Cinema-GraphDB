@@ -74,7 +74,24 @@ result = transaction.run("""
     """)
 for record in result:
     write_output.write(record['m.genre'] + '\n')
-    print(record['m.genre'])
+
+write_output.write("\n")
+
+# 7.) Show which directors have directed movies in at least 2 different genres.
+# OUTPUT: director name, number of genres
+
+write_output.write("### Q7 ###\n")
+
+result = transaction.run("""
+    MATCH (d:Director)-[:DIRECTED]->(m:Movie)
+    WITH collect(DISTINCT m.genre) as genres, d
+    WHERE length(genres) > 1
+    RETURN d.name, length(genres)
+    ORDER BY length(genres) DESC
+    """)
+for record in result:
+    # write_output.write(record['m.genre'] + '\n')
+    print(record['d.name'] + ', ' + str(record['length(genres)']))
 
 write_output.write("\n")
 
