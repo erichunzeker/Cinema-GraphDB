@@ -25,7 +25,6 @@ result = transaction.run("""
     """)
 for record in result:
     write_output.write(record['a.name'] + ',' + str(record['length(movies)']) + '\n')
-    # print(record['a.name'], ',', record['length(movies)'])
 
 write_output.write("\n")
 
@@ -41,7 +40,6 @@ result = transaction.run("""
     """)
 for record in result:
     write_output.write(record['mt'] + '\n')
-    # print(record['mt'])
 
 write_output.write("\n")
 
@@ -52,13 +50,13 @@ write_output.write("### Q3 ###\n")
 
 result = transaction.run("""
     MATCH (a:Actor)-[:ACTS_IN]->(m:Movie)
-    WITH collect(a) as actors, m
+    MATCH (u)-[r:RATED]->(m:Movie)
+    WITH collect(DISTINCT a) as actors, m
     RETURN m.title, length(actors)
     ORDER BY length(actors) DESC;   
     """)
 for record in result:
     write_output.write(record['m.title'] + ', ' + str(record['length(actors)']) + '\n')
-    # print(record['m.title'] + ', ' + str(record['length(actors)']))
 
 write_output.write("\n")
 
@@ -90,10 +88,25 @@ result = transaction.run("""
     ORDER BY length(genres) DESC
     """)
 for record in result:
-    # write_output.write(record['m.genre'] + '\n')
-    print(record['d.name'] + ', ' + str(record['length(genres)']))
+    write_output.write(record['d.name'] + ', ' + str(record['length(genres)']) + '\n')
 
 write_output.write("\n")
+
+# 8.) Show the top 5 pairs of actor, director combinations, in descending order of frequency of occurrence.
+# OUTPUT: director's name, actors' name, number of times director directed said actor in a movie
+
+write_output.write("### Q8 ###\n")
+
+result = transaction.run("""
+    MATCH (d:Director)-[:DIRECTED]->(m:Movie)
+    WITH collect(DISTINCT m.genre) as genres, d
+    WHERE length(genres) > 1
+    RETURN d.name, length(genres)
+    ORDER BY length(genres) DESC
+    """)
+# for record in result:
+    # write_output.write(record['m.genre'] + '\n')
+    # print(record['d.name'] + ', ' + str(record['length(genres)']))
 
 
 transaction.close()
