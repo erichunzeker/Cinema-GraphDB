@@ -12,7 +12,8 @@ transaction = session.begin_transaction()
 write_output = open("output.txt", "w")
 
 # finished: 1, 2, 3, 6, 7
-# todo: 4, 5, 8
+# revisit: 5
+# todo: 4, 8
 
 # 1.) List the first 20 actors in descending order of the number of films they acted in.
 # OUTPUT: actor_name, number_of_films_acted_in
@@ -61,6 +62,20 @@ result = transaction.run("""
     """)
 for record in result:
     write_output.write(record['m.title'] + ', ' + str(record['length(actors)']) + '\n')
+
+write_output.write("\n")
+
+# 4.) Find all the actors who have worked with at least 3 different directors (regardless of how many movies
+# they acted in). For example, 3 movies with one director each would satisfy this (provided the directors
+# where different), but also a single movie with 3 directors would satisfy it as well.
+# OUTPUT: actor_name, number_of_directors_he/she_has_worked_with
+
+write_output.write("### Q4 ###\n")
+
+result = transaction.run("""
+    """)
+for record in result:
+    write_output.write(record[''] + '\n')
 
 write_output.write("\n")
 
