@@ -11,6 +11,9 @@ transaction = session.begin_transaction()
 
 write_output = open("output.txt", "w")
 
+# finished: 1, 2, 3, 6, 7
+# todo: 4, 5, 8
+
 # 1.) List the first 20 actors in descending order of the number of films they acted in.
 # OUTPUT: actor_name, number_of_films_acted_in
 
@@ -53,10 +56,29 @@ result = transaction.run("""
     MATCH (u)-[r:RATED]->(m:Movie)
     WITH collect(DISTINCT a) as actors, m
     RETURN m.title, length(actors)
-    ORDER BY length(actors) DESC;   
+    ORDER BY length(actors) DESC 
+    LIMIT 1;  
     """)
 for record in result:
     write_output.write(record['m.title'] + ', ' + str(record['length(actors)']) + '\n')
+
+write_output.write("\n")
+
+# 5.) The Bacon number of an actor is the length of the shortest path between the actor and Kevin Bacon
+# in the "co-acting" graph. That is, Kevin Bacon has Bacon number 0; all actors who acted in the same
+# movie as him have Bacon number 1; all actors who acted in the same film as some actor with Bacon
+# number 1 have Bacon number 2, etc. List all actors whose Bacon number is exactly 2 (first name, last name).
+# You can familiarize yourself with the concept, by visiting The Oracle of Bacon.
+# OUTPUT: actor_name
+
+write_output.write("### Q5 ###\n")
+
+result = transaction.run("""
+    MATCH (bacon2:Actor)-[:ACTS_IN]->(movie2:Movie)<-[:ACTS_IN]-(bacon1:Actor)-[:ACTS_IN]->(movie:Movie)<-[:ACTS_IN]-(bacon:Actor {name: 'Kevin Bacon'}) 
+    RETURN bacon2.name  
+    """)
+for record in result:
+    write_output.write(record['bacon2.name'] + '\n')
 
 write_output.write("\n")
 
@@ -68,7 +90,7 @@ write_output.write("### Q6 ###\n")
 result = transaction.run("""
     MATCH (a:Actor)-[:ACTS_IN]->(m:Movie)
     WHERE a.name = "Tom Hanks"
-    RETURN DISTINCT m.genre
+    RETURN DISTINCT m.genre;
     """)
 for record in result:
     write_output.write(record['m.genre'] + '\n')
