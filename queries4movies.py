@@ -11,9 +11,6 @@ transaction = session.begin_transaction()
 
 write_output = open("output.txt", "w")
 
-# finished: 1, 2, 3, 4, 6, 7, 8
-# revisit: 5
-
 # 1.) List the first 20 actors in descending order of the number of films they acted in.
 # OUTPUT: actor_name, number_of_films_acted_in
 
@@ -89,16 +86,14 @@ write_output.write("\n")
 # OUTPUT: actor_name
 
 write_output.write("### Q5 ###\n")
-# MATCH (bacon2:Actor)-[:ACTS_IN]->(movie2:Movie)<-[:ACTS_IN]-(bacon1:Actor)-[:ACTS_IN]->(movie:Movie)<-[:ACTS_IN]-(
-# bacon:Actor {name: 'Kevin Bacon'}) RETURN DISTINCT bacon2.name
+
 result = transaction.run("""
     MATCH (bacon2:Actor)-[:ACTS_IN]->(movie2:Movie)<-[:ACTS_IN]-(bacon1:Actor)-[:ACTS_IN]->(movie:Movie)<-[:ACTS_IN]-(bacon:Actor {name: 'Kevin Bacon'})
     with collect(distinct bacon1.name) as b1n, collect(distinct bacon2.name) as b2n
-    RETURN FILTER( n IN b2n WHERE NOT n IN b1n ) as bbb    
+    RETURN FILTER( n IN b2n WHERE NOT n IN b1n ) as bacon2_exclusive    
     """)
 for record in result:
-    for i in record['bbb']:
-        print(i)
+    for i in record['bacon2_exclusive']:
         write_output.write(i + '\n')
 
 write_output.write("\n")
