@@ -11,9 +11,8 @@ transaction = session.begin_transaction()
 
 write_output = open("output.txt", "w")
 
-# finished: 1, 2, 3, 4, 6, 7
+# finished: 1, 2, 3, 4, 6, 7, 8
 # revisit: 5
-# todo: 8
 
 # 1.) List the first 20 actors in descending order of the number of films they acted in.
 # OUTPUT: actor_name, number_of_films_acted_in
@@ -139,13 +138,13 @@ write_output.write("### Q8 ###\n")
 
 result = transaction.run("""
     MATCH (a:Actor)-[:ACTS_IN]->(m:Movie)<-[:DIRECTED]-(d:Director)
-    WITH d, a, collect((a:Actor)-[:ACTS_IN]->()<-[:DIRECTED]-(d:Director)) as unique
-    RETURN d.name, a.name, size(unique) as director_actor_pair
+    WITH d, a, collect((a:Actor)-[:ACTS_IN]->()<-[:DIRECTED]-(d:Director)) as unique_pair
+    RETURN d.name, a.name, size(unique_pair) as director_actor_pair
     ORDER BY director_actor_pair DESC 
     LIMIT 5
     """)
 for record in result:
-    # write_output.write(record['m.genre'] + '\n')
+    write_output.write(record['d.name'] + ', ' + record['a.name'] + ', ' + str(record['director_actor_pair']) + '\n')
     print(record['d.name'] + ', ' + record['a.name'] + ', ' + str(record['director_actor_pair']))
 
 
