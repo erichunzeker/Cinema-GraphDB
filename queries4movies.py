@@ -92,8 +92,8 @@ write_output.write("\n")
 write_output.write("### Q5 ###\n")
 
 result = transaction.run("""
-    MATCH (bacon2:Actor)-[:ACTS_IN]->(movie2:Movie)<-[:ACTS_IN]-(bacon1:Actor)-[:ACTS_IN]->(movie:Movie)<-[:ACTS_IN]-(bacon:Actor {name: 'Kevin Bacon'}) 
-    RETURN bacon2.name  
+    MATCH (bacon2:Actor)-[:ACTS_IN]->(movie2:Movie)<-[:ACTS_IN]-(bacon1:Actor)-[:ACTS_IN]->(movie:Movie)<-[:ACTS_IN]-(bacon:Actor {name: 'Kevin Bacon'})
+    RETURN bacon2.name
     """)
 for record in result:
     write_output.write(record['bacon2.name'] + '\n')
@@ -138,15 +138,15 @@ write_output.write("\n")
 write_output.write("### Q8 ###\n")
 
 result = transaction.run("""
-    MATCH (d:Director)-[:DIRECTED]->(m:Movie)
-    WITH collect(DISTINCT m.genre) as genres, d
-    WHERE length(genres) > 1
-    RETURN d.name, length(genres)
-    ORDER BY length(genres) DESC
+    MATCH (a:Actor)-[:ACTS_IN]->(m:Movie)<-[:DIRECTED]-(d:Director)
+    WITH d, a, collect((a:Actor)-[:ACTS_IN]->()<-[:DIRECTED]-(d:Director)) as unique
+    RETURN d.name, a.name, size(unique) as director_actor_pair
+    ORDER BY director_actor_pair DESC 
+    LIMIT 5
     """)
-# for record in result:
+for record in result:
     # write_output.write(record['m.genre'] + '\n')
-    # print(record['d.name'] + ', ' + str(record['length(genres)']))
+    print(record['d.name'] + ', ' + record['a.name'] + ', ' + str(record['director_actor_pair']))
 
 
 transaction.close()
