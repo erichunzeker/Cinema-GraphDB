@@ -89,7 +89,7 @@ write_output.write("### Q5 ###\n")
 
 result = transaction.run("""
     MATCH (bacon2:Actor)-[:ACTS_IN]->(movie2:Movie)<-[:ACTS_IN]-(bacon1:Actor)-[:ACTS_IN]->(movie:Movie)<-[:ACTS_IN]-(bacon:Actor {name: 'Kevin Bacon'})
-    with collect(distinct bacon1.name) as b1n, collect(distinct bacon2.name) as b2n
+    WITH collect(distinct bacon1.name) as b1n, collect(distinct bacon2.name) as b2n
     RETURN FILTER( n IN b2n WHERE NOT n IN b1n ) as bacon2_exclusive    
     """)
 for record in result:
