@@ -89,13 +89,17 @@ write_output.write("\n")
 # OUTPUT: actor_name
 
 write_output.write("### Q5 ###\n")
-
+# MATCH (bacon2:Actor)-[:ACTS_IN]->(movie2:Movie)<-[:ACTS_IN]-(bacon1:Actor)-[:ACTS_IN]->(movie:Movie)<-[:ACTS_IN]-(
+# bacon:Actor {name: 'Kevin Bacon'}) RETURN DISTINCT bacon2.name
 result = transaction.run("""
     MATCH (bacon2:Actor)-[:ACTS_IN]->(movie2:Movie)<-[:ACTS_IN]-(bacon1:Actor)-[:ACTS_IN]->(movie:Movie)<-[:ACTS_IN]-(bacon:Actor {name: 'Kevin Bacon'})
-    RETURN bacon2.name
+    with collect(distinct bacon1.name) as b1n, collect(distinct bacon2.name) as b2n
+    RETURN FILTER( n IN b2n WHERE NOT n IN b1n ) as bbb    
     """)
 for record in result:
-    write_output.write(record['bacon2.name'] + '\n')
+    for i in record['bbb']:
+        print(i)
+        write_output.write(i + '\n')
 
 write_output.write("\n")
 
@@ -145,7 +149,6 @@ result = transaction.run("""
     """)
 for record in result:
     write_output.write(record['d.name'] + ', ' + record['a.name'] + ', ' + str(record['director_actor_pair']) + '\n')
-    print(record['d.name'] + ', ' + record['a.name'] + ', ' + str(record['director_actor_pair']))
 
 
 transaction.close()
